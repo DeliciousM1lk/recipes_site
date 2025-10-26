@@ -31,6 +31,7 @@ class RecipeAdmin(admin.ModelAdmin):
             'rejected': 'red',
         }.get(obj.status, 'black')
         return format_html('<b><span style="color: {};">{}</span></b>', color, obj.get_status_display())
+
     status_colored.short_description = 'Статус'
 
     def approve_recipes(self, request, queryset):
@@ -40,6 +41,7 @@ class RecipeAdmin(admin.ModelAdmin):
             moderator_comment='Одобрено модератором через массовое действие.'
         )
         self.message_user(request, f"{updated} рецептов успешно одобрено.", messages.SUCCESS)
+
     approve_recipes.short_description = "Одобрить выбранные рецепты"
 
     def reject_recipes(self, request, queryset):
@@ -49,6 +51,7 @@ class RecipeAdmin(admin.ModelAdmin):
             moderator_comment='Отклонено модератором через массовое действие.'
         )
         self.message_user(request, f"{updated} рецептов успешно отклонено.", messages.WARNING)
+
     reject_recipes.short_description = "Отклонить выбранные рецепты"
 
     def get_readonly_fields(self, request, obj=None):
@@ -78,4 +81,5 @@ class CommentAdmin(admin.ModelAdmin):
 
     def short_text(self, obj):
         return obj.text[:50] + '...' if len(obj.text) > 50 else obj.text
+
     short_text.short_description = 'Комментарий'
