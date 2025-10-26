@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Мои избранные рецепты</h2>
+
+<form method="get" class="filter-form">
+    <input type="text" name="q" placeholder="Поиск по названию..." value="{{ search_query }}">
+    <select name="category">
+        <option value="">Все категории</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>
+            {{ cat.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">🔍</button>
+</form>
+
+{% if favorites %}
+<div class="container">
+    {% comment %} Добавил контейнер, чтобы рецепты не прилипали к краям страницы {% endcomment %}
+    <div class="recipe-grid">
+        {% for fav in favorites %}
+        <div class="recipe-card">
+            <a href="{% url 'recipe_detail' fav.recipe.id %}">
+                {% if fav.recipe.image %}
+                    <img src="{{ fav.recipe.image.url }}" alt="{{ fav.recipe.title }}">
+                {% else %}
+                    <img src="{% static 'images/no-image.jpg' %}" alt="Нет фото">
+                {% endif %}
+            </a>
+
+            {# ИЗМЕНЕНИЕ: Заменяем recipe-info на recipe-card-content #}
+            <div class="recipe-card-content">
+                <h3>{{ fav.recipe.title }}</h3>
+                <p class="category">{{ fav.recipe.category.name }}</p>
+                <p>{{ fav.recipe.description|truncatewords:20 }}</p>
+
+                {# Стилизация кнопки "Удалить" приведена в соответствие с классом favorite-button #}
+                <form action="{% url 'favorite_toggle' fav.recipe.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="favorite-button remove">★ Удалить</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{# Пагинация, если она есть, должна идти после recipe-grid #}
+{% else %}
+<p>Вы ещё не добавили рецепты в избранное.</p>
+{% endif %}
+{% endblock %}
